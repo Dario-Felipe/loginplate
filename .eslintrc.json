@@ -28,6 +28,7 @@
               "endOfLine": "auto"
             }
           ],
+          "import/no-extraneous-dependencies": ["error", {"devDependencies": true, "optionalDependencies": false, "peerDependencies": false}],
           "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
           "import/prefer-default-export": "off",
           "jsx-a11y/anchor-is-valid": "off",
