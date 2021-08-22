@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
+import Cookies from 'js-cookie';
+import { useAuth } from '../../providers/auth';
 import fire from '../../services/fire';
 import LoginForm from '../../components/LoginForm';
 
@@ -10,6 +12,7 @@ const Login = () => {
   });
   const [errorMessage, setErrorMessage] = useState(false);
   const history = useHistory();
+  const { setAuth } = useAuth();
 
   const handleInput = (event) => {
     setInputInfo({
@@ -26,7 +29,8 @@ const Login = () => {
       .auth()
       .signInWithEmailAndPassword(inputInfo.login, inputInfo.password)
       .then((result) => {
-        console.log(result);
+        Cookies.set('user', JSON.stringify(result));
+        setAuth(true);
         history.push('/dashboard');
       })
       .catch((error) => {
