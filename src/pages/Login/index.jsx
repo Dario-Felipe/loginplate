@@ -31,7 +31,7 @@ const Login = () => {
       .then((result) => {
         Cookies.set('user', JSON.stringify(result));
         setAuth(true);
-        history.push('/dashboard');
+        history.push('/');
       })
       .catch((error) => {
         setErrorMessage(error.message);
