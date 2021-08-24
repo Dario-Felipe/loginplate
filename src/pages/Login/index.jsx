@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import Cookies from 'js-cookie';
+import { Button, Box } from '@gympass/yoga';
 import { useAuth } from '../../providers/auth';
 import fire from '../../services/fire';
-import LoginForm from '../../components/LoginForm';
+import Form from '../../components/Form';
 
 const Login = () => {
   const [inputInfo, setInputInfo] = useState({
@@ -11,17 +12,26 @@ const Login = () => {
     password: '',
   });
   const [errorMessage, setErrorMessage] = useState(false);
+  const [isRegister, setIsRegister] = useState(false);
   const history = useHistory();
   const { setAuth } = useAuth();
 
-  const handleInput = (event) => {
+  const changeInput = (event) => {
     setInputInfo({
       ...inputInfo,
       [event.target.name]: event.target.value,
     });
   };
 
-  const handleSingIn = (event) => {
+  const cleanFields = () => {
+    setInputInfo({
+      login: '',
+      password: '',
+    });
+    setErrorMessage(false);
+  };
+
+  const signIn = (event) => {
     event.preventDefault();
     setErrorMessage(false);
 
@@ -38,15 +48,49 @@ const Login = () => {
       });
   };
 
+  const createUser = (event) => {
+    event.preventDefault();
+    setErrorMessage(false);
+
+    if (inputInfo.password !== inputInfo.passwordConfirmation) {
+      setInputInfo({ ...inputInfo, password: '', passwordConfirmation: '' });
+      return setErrorMessage('The passwords needs be equals, please try again');
+    }
+
+    fire
+      .auth()
+      .createUserWithEmailAndPassword(inputInfo.login, inputInfo.password)
+      .then((newCredential) => {
+        Cookies.set('user', JSON.stringify(newCredential));
+        setAuth(true);
+        history.push('/');
+      })
+      .catch((error) => setErrorMessage(error.message));
+
+    return 0;
+  };
+
   return (
     <>
-      <LoginForm
-        handleSingIn={handleSingIn}
-        handleInput={handleInput}
-        errorMessage={errorMessage}
-        inputInfo={inputInfo}
-        setInputInfo={setInputInfo}
+      <Form
+        mainHandler={isRegister ? createUser : signIn}
+        handlers={{ changeInput, setInputInfo }}
+        infos={{ errorMessage, inputInfo, isRegister }}
       />
+      <Box display="flex" alignItems="center">
+        <span>
+          {isRegister ? 'Are you already registered?' : 'Not registered yet?'}
+        </span>
+        <Button.Text
+          style={{ padding: 4 }}
+          onClick={() => {
+            setIsRegister(!isRegister);
+            cleanFields();
+          }}
+        >
+          {isRegister ? 'Sign In' : 'Create an account'}
+        </Button.Text>
+      </Box>
     </>
   );
 };
