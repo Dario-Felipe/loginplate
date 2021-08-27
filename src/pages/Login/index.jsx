@@ -7,14 +7,16 @@ import fire from '../../services/fire';
 import Form from '../../components/Form';
 
 const Login = () => {
+  const history = useHistory();
+  const { setAuth } = useAuth();
+
   const [inputInfo, setInputInfo] = useState({
     login: '',
     password: '',
   });
   const [errorMessage, setErrorMessage] = useState(false);
   const [isRegister, setIsRegister] = useState(false);
-  const history = useHistory();
-  const { setAuth } = useAuth();
+  const [forgotPassword, setForgotPassword] = useState(false);
 
   const changeInput = (event) => {
     setInputInfo({
@@ -70,27 +72,60 @@ const Login = () => {
     return 0;
   };
 
+  const ResetPassword = (event) => {
+    event.preventDefault();
+    setErrorMessage(false);
+
+    fire
+      .auth()
+      .sendPasswordResetEmail(inputInfo.login)
+      .then(() => {
+        alert('Reset password was sent, please check your e-mail box');
+        setForgotPassword(false);
+      })
+      .catch((error) => setErrorMessage(error.message));
+  };
+
   return (
     <>
       <Form
-        mainHandler={isRegister ? createUser : signIn}
+        mainHandler={
+          isRegister ? createUser : forgotPassword ? ResetPassword : signIn
+        }
         handlers={{ changeInput, setInputInfo }}
-        infos={{ errorMessage, inputInfo, isRegister }}
+        infos={{ errorMessage, inputInfo, isRegister, forgotPassword }}
       />
-      <Box display="flex" alignItems="center">
-        <span>
-          {isRegister ? 'Are you already registered?' : 'Not registered yet?'}
-        </span>
-        <Button.Text
-          style={{ padding: 4 }}
-          onClick={() => {
-            setIsRegister(!isRegister);
-            cleanFields();
-          }}
-        >
-          {isRegister ? 'Sign In' : 'Create an account'}
-        </Button.Text>
-      </Box>
+
+      {!isRegister && (
+        <Box display="flex" alignItems="center">
+          <Button.Text
+            style={{ padding: 4 }}
+            onClick={() => {
+              setForgotPassword(!forgotPassword);
+              cleanFields();
+            }}
+          >
+            {forgotPassword ? 'Return to login' : 'Forgot your password?'}
+          </Button.Text>
+        </Box>
+      )}
+
+      {!forgotPassword && (
+        <Box display="flex" alignItems="center">
+          <span>
+            {isRegister ? 'Are you already registered?' : 'Not registered yet?'}
+          </span>
+          <Button.Text
+            style={{ padding: 4 }}
+            onClick={() => {
+              setIsRegister(!isRegister);
+              cleanFields();
+            }}
+          >
+            {isRegister ? 'Sign In' : 'Create an account'}
+          </Button.Text>
+        </Box>
+      )}
     </>
   );
 };

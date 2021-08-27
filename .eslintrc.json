@@ -36,6 +36,7 @@
           "jsx-a11y/label-has-associated-control": "off",
           "no-console": "off",
           "react/jsx-props-no-spreading": "off",
-          "no-alert": "off"
+          "no-alert": "off",
+          "no-nested-ternary": "off"
     }
 }

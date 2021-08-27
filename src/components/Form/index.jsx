@@ -19,12 +19,14 @@ const Form = ({ mainHandler, handlers, infos }) => (
       onClean={() => handlers.setInputInfo({ ...infos.inputInfo, login: '' })}
     />
 
-    <Input.Password
-      label="Password"
-      name="password"
-      value={infos.inputInfo.password}
-      onChange={handlers.changeInput}
-    />
+    {!infos.forgotPassword && (
+      <Input.Password
+        label="Password"
+        name="password"
+        value={infos.inputInfo.password}
+        onChange={handlers.changeInput}
+      />
+    )}
 
     {infos.isRegister && (
       <Input.Password
@@ -37,7 +39,11 @@ const Form = ({ mainHandler, handlers, infos }) => (
 
     <div>
       <Button type="submit">
-        {infos.isRegister ? 'Create account' : 'Sing In'}
+        {infos.isRegister
+          ? 'Create account'
+          : infos.forgotPassword
+          ? 'Send me a reset'
+          : 'Sing In'}
       </Button>
     </div>
 
